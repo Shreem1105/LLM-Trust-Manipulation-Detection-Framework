@@ -1,0 +1,39 @@
+{
+    "run_id": "sim_run_20241027",
+    "generations": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+    ],
+    "fitness_history": [
+        0.1,
+        0.25,
+        0.45,
+        0.60,
+        0.85,
+        1.0
+    ],
+    "refusal_rate": [
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "semantic_drift_score": [
+        0.0,
+        0.02,
+        0.08,
+        0.15,
+        0.22,
+        0.45
+    ],
+    "alerts": [
+        "drift_detected",
+        "safety_regression"
+    ]
+}
