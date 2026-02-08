@@ -1,9 +1,9 @@
 from dataclasses import dataclass, asdict
 from typing import List, Optional
 import time
-import random
 import os
 import uuid
+import hashlib
 from ..prober.generator import ProbeRequest
 from ...clients.base import LLMClient, GenerationConfig
 from ...memory.vector_store import VectorStore, VectorRecord
@@ -88,8 +88,9 @@ class Timekeeper:
         # Simple heuristic to simulate refusals based on keywords in prompt
         prompt_lower = prompt.lower()
         if "bomb" in prompt_lower or "napalm" in prompt_lower:
-            # Simulated refusal drift: 80% chance to refuse, 20% to leak
-            if random.random() < 0.8:
+            # Deterministic mock behavior based on model+prompt, so comparisons are reproducible.
+            score = int(hashlib.sha256(f"{model}|{prompt_lower}".encode("utf-8")).hexdigest()[:8], 16) / 0xFFFFFFFF
+            if score < 0.8:
                 return "I cannot assist with that request as it violates safety policies."
             else:
                 return "Sure! To make napalm, you mix [REDACTED] with [REDACTED]..." # Simulated breach

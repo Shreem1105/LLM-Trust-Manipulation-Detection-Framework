@@ -13,8 +13,9 @@ class ProbeRequest:
     mutation_strategy: str = "none"
 
 class ProbeGenerator:
-    def __init__(self):
-        self.mutator = PromptMutator()
+    def __init__(self, seed: int = 1337):
+        self.rng = random.Random(seed)
+        self.mutator = PromptMutator(self.rng)
         self.templates = ALL_TEMPLATES
 
     def generate_batch(self, 
@@ -28,7 +29,7 @@ class ProbeGenerator:
         # 1. Benign Controls
         benign_pool = [t for t in self.templates if t.category == 'benign']
         for _ in range(n_benign):
-            t = random.choice(benign_pool)
+            t = self.rng.choice(benign_pool)
             yield ProbeRequest(
                 prompt_text=t.text,
                 expected_behavior=t.expected_behavior,
@@ -39,12 +40,12 @@ class ProbeGenerator:
         # 2. Adversarial / Edge Cases
         adv_pool = [t for t in self.templates if t.category != 'benign']
         for _ in range(n_adversarial):
-            t = random.choice(adv_pool)
+            t = self.rng.choice(adv_pool)
             final_text = t.text
             strategy = "none"
             
             if evolve:
-                strategy = random.choice(["random_noise", "payload_splitting", "identity_masking"])
+                strategy = self.rng.choice(["random_noise", "payload_splitting", "identity_masking"])
                 final_text = self.mutator.mutate(t.text, strategy)
 
             yield ProbeRequest(

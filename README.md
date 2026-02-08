@@ -180,9 +180,19 @@ We use a local `JSONL` file approach. It's fast, portable, and doesn't require s
 # 1. Clone the repo (if using git) or navigate to folder
 cd temporal-drift-framework
 
-# 2. Install dependencies (standard libraries used mostly, simple requirements)
-# No complex install needed for the core python logic provided.
+# 2. Install dependencies
+pip install -r requirements.txt
 ```
+
+### Mode 0: Run Without API Keys (Mock Mode)
+Runs the full framework with deterministic mock model behavior (no `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` needed).
+```bash
+python src/main.py --mode run --model gpt-3.5-turbo
+python src/main.py --mode run --model gpt-3.5-turbo --evolve
+python src/main.py --mode compare --baseline run_1770525461 --current run_1770525466
+python src/main.py --mode evolve --model gpt-3.5-turbo
+```
+*   *Action:* Generates run history, drift report, and evolution lineage under `data/results/`.
 
 ### Mode 1: Run a Standard Campaign (Real)
 Runs a batch of benign and adversarial prompts against a real model.
@@ -194,9 +204,9 @@ python src/main.py --mode run --real --provider openai --model gpt-3.5-turbo
 ### Mode 2: Run a Comparison (Drift Detection)
 Compares two previous runs to see if the model changed.
 ```bash
-python src/main.py --mode compare --baseline run_12345.jsonl --current run_67890.jsonl
+python src/main.py --mode compare --baseline run_12345 --current run_67890
 ```
-*   *Action:* Calculates ΔRR and Semantic Drift. Outputs `report.md`.
+*   *Action:* Calculates ΔRR and Semantic Drift. Outputs `report_run_*.md`.
 
 ### Mode 3: Evolutionary Attack (Red Teaming)
 Tries to break the model using genetic algorithms.
@@ -204,6 +214,30 @@ Tries to break the model using genetic algorithms.
 python src/main.py --mode evolve --model gpt-3.5-turbo
 ```
 *   *Action:* Runs 5 generations of mutations. outputs `evolution_lineage.jsonl`.
+
+### Example Output (Mock Mode)
+```text
+[*] Starting Evaluation Run on gpt-3.5-turbo...
+[*] Generated 6 probes.
+[*] Timekeeper: Starting evaluation of 6 probes on gpt-3.5-turbo...
+[+] Saved 6 results to ...\data\results\run_1770525461.jsonl
+[*] Run completed. Results saved to: ...\data\results\run_1770525461.jsonl
+
+[*] Comparing Run run_1770525461 vs run_1770525466...
+--- DRIFT REPORT ---
+{
+  "metrics": {
+    "previous_refusal_rate": 0.0,
+    "current_refusal_rate": 0.0,
+    "refusal_delta": 0.0,
+    "semantic_drift_score": -7.401486830834377e-17
+  },
+  "alerts": [],
+  "status": "PASS"
+}
+[*] Audit Report generated: ...\data\results\report_run_1770525466.md
+[+] System Stable. No significant drift detected.
+```
 
 ---
 

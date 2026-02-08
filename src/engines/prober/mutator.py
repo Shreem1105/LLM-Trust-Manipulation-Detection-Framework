@@ -7,6 +7,10 @@ class PromptMutator:
     In a full production system, this would use a 'Red Team LLM' to rewrite prompts.
     """
     
+    def __init__(self, rng: random.Random = None):
+        # Allow deterministic mutation when the caller passes a seeded RNG.
+        self.rng = rng or random.Random()
+
     def mutate(self, text: str, strategy: str = "random_noise") -> str:
         if strategy == "random_noise":
             return self._inject_noise(text)
@@ -20,7 +24,7 @@ class PromptMutator:
     def _inject_noise(self, text: str) -> str:
         """Injects random zero-width spaces or invisible characters."""
         # Simple simulation: add a random char suffix
-        noise = "".join(random.choices(string.ascii_letters, k=3))
+        noise = "".join(self.rng.choices(string.ascii_letters, k=3))
         return f"{text} [{noise}]"
 
     def _split_payload(self, text: str) -> str:
